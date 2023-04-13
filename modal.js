@@ -9,6 +9,7 @@ function editNav() {
 
 // DOM Elements
 const modalbg = document.querySelector(".bground");
+const modalbgAccept = document.querySelector(".bgroundAccept");
 const modalBtn = document.querySelectorAll(".modal-btn");
 const formData = document.querySelectorAll(".formData");
 
@@ -25,6 +26,11 @@ function launchModal() {
  */
 function closeModal() {
   modalbg.style.display = "none";
+  modalbgAccept.style.display = "none";
+}
+
+function closeModalAccept() {
+  modalbgAccept.style.display = "none";
 }
 
 const form = document.querySelector('#reserve');
@@ -46,18 +52,21 @@ function validate() {
   const regexEmail = /^[a-z A-Z 0-9+_.-]+@[a-z A-Z 0-9.-]+\.[a-z A-Z]+$/;
   const regexQuantity = /^[0-9]+$/;
 
-  let locResult = validateField(firstName, "prénom", regexName);
+  /*let locResult = validateField(firstName, "prénom", regexName);
   locResult &= validateField(lastName, "nom", regexName);
   locResult &= validateField(email, "email", regexEmail);
   locResult &= validateBirthdate();
   locResult &= validateField(quantity,"nombre de tournoi", regexQuantity);
   locResult &= validateCity();
-  locResult &= acceptConditions();
+  locResult &= acceptConditions();*/
 
+  let locResult = true;
   if(!locResult){
     return;
   } else {
-    alert('ok');
+    closeModal();
+    modalbgAccept.style.display = "block";
+
   } 
 };
 
@@ -69,15 +78,14 @@ function validate() {
  * @returns {boolean}
  */
 function validateField(parElement, parName, parRegex) {
-  const parent = parElement.parentNode;
-
-  if (!parRegex.test(parElement.value)) {
-    parElement.focus();
-    parent.setAttribute("data-error", "Le champ " + parName + " est requis et/ou n'est pas rempli correctement");
-    parent.setAttribute("data-error-visible", "true");
-    return false;
-  }
-  parent.setAttribute("data-error-visible", "false");
+    if (!parRegex.test(parElement.value)) {
+      parElement.focus();
+      locMessage = "Le champ " + parName + " est requis et/ou n'est pas rempli correctement";
+      errorMessageForm(parElement, locMessage, true);
+      
+      return false;
+    }
+  errorMessageForm(parElement, '', false);
   return true;
 }
 
@@ -89,17 +97,17 @@ function validateBirthdate(){
   form.addEventListener('submit', function(e) {
     e.preventDefault();
   });
+  locMessage = "Vous devez avoir plus de 18 ans";
   let locDate = new Date();
   let locDateUser = new Date(birthdate.value);
   let locAge = ageCalculation(locDate, locDateUser);
-  const parent = birthdate.parentNode;
+
   if(locAge < 18){
     birthdate.focus();
-    parent.setAttribute("data-error", "Vous devez avoir plus de 18 ans");
-    parent.setAttribute("data-error-visible", "true");
+    errorMessageForm(birthdate, locMessage, true);
     return false;
   }
-  parent.setAttribute("data-error-visible", "false");
+  errorMessageForm(birthdate, '', false);
   return true;
 }
 
@@ -109,15 +117,14 @@ function validateBirthdate(){
  */
 function validateCity() {
   let locCity = document.getElementById('location1')
-
+  let locMessage = "Sélectionnez au moins un tournoi";
   for(let i=0; i<6; i++) {
     if(listCity[i].checked === true) {
       listCity[i].parentNode.setAttribute("data-error-visible", "false");
       return true;
     }
   }
-  locCity.parentNode.setAttribute("data-error", "Sélectionnez au moins un tournoi");
-  locCity.parentNode.setAttribute("data-error-visible", "true");
+  errorMessageForm(locCity, locMessage, true);
 
   return false;
 }
@@ -150,19 +157,18 @@ function ageCalculation(parDate, parBirthdate){
   return locAge;
 }
 /**
- * Pour vérifier que le bouton radio est bien coché.
+ * Pour vérifier que le bouton radio soit coché.
  * @returns {boolean}
  */
 function acceptConditions() {
   const locAccept = document.getElementById('checkbox1');
-  const locParent = locAccept.parentNode;
+  const locMessage = "Vous devez accepter les conditions générales";
 
   if (locAccept.checked) {
-    locParent.setAttribute("data-error-visible", "false");
+    errorMessageForm(locAccept,'', false);
     return true;
   }
-  locParent.setAttribute("data-error", "Vous devez accepter les conditions générales");
-  locParent.setAttribute("data-error-visible", "true");
+  errorMessageForm(locAccept, locMessage, true);
 
   return false;
 }
@@ -173,3 +179,21 @@ Pour éviter que la modale se ferme lorsqu'il y a des erreurs.
 form.addEventListener('submit', function(e) {
   e.preventDefault();
 });
+
+/**
+ * Fonction qui affiche ou non le message d'erreur
+ * @param {HTMLElement} parField 
+ * @param {string} parMessage 
+ * @param {boolean} parVisible 
+ * @returns 
+ */
+function errorMessageForm (parField, parMessage, parVisible) {
+  const locParent = parField.parentNode;
+  if(parVisible === false) {
+    return locParent.setAttribute("data-error-visible", "false");
+  }
+  locParent.setAttribute("data-error", parMessage);
+  locParent.setAttribute("data-error-visible", "true");
+
+
+}
