@@ -16,6 +16,7 @@ const formData = document.querySelectorAll(".formData");
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 
+let flag = true;
 // launch modal form
 function launchModal() {
   modalbg.style.display = "block";
@@ -29,11 +30,9 @@ function closeModal() {
   modalbgAccept.style.display = "none";
 }
 
-function closeModalAccept() {
-  modalbgAccept.style.display = "none";
-}
-
 const form = document.querySelector('#reserve');
+
+const formReset = document.getElementById('reserve')
 
 const firstName = document.getElementById('first');
 const lastName = document.getElementById('last');
@@ -52,21 +51,20 @@ function validate() {
   const regexEmail = /^[a-z A-Z 0-9+_.-]+@[a-z A-Z 0-9.-]+\.[a-z A-Z]+$/;
   const regexQuantity = /^[0-9]+$/;
 
-  /*let locResult = validateField(firstName, "prénom", regexName);
+  let locResult = validateField(firstName, "prénom", regexName);
   locResult &= validateField(lastName, "nom", regexName);
   locResult &= validateField(email, "email", regexEmail);
   locResult &= validateBirthdate();
   locResult &= validateField(quantity,"nombre de tournoi", regexQuantity);
   locResult &= validateCity();
-  locResult &= acceptConditions();*/
+  locResult &= acceptConditions();
 
-  let locResult = true;
   if(!locResult){
     return;
   } else {
     closeModal();
     modalbgAccept.style.display = "block";
-
+    formReset.reset();
   } 
 };
 
